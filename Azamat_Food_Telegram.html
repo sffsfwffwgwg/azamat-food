@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="kk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Azamat Food</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#f7f7f7;color:#222}
+header{position:sticky;top:0;background:#fff;z-index:5;padding:14px 5%;display:flex;justify-content:space-between;align-items:center;box-shadow:0 2px 10px #0001}
+.logo{font-size:25px;font-weight:800}.logo span{color:#e63946}
+button{border:0;border-radius:12px;padding:11px 16px;font-weight:700;cursor:pointer}
+.cart{background:#e63946;color:white}.hero{padding:45px 5%;background:#fff;text-align:center}.hero h1{font-size:42px;margin:5px}.hero p{color:#666}
+.tabs{display:flex;gap:10px;overflow:auto;padding:18px 5%;justify-content:center}.tabs button{background:white}.tabs button.active{background:#222;color:white}
+.grid{max-width:1100px;margin:auto;padding:10px 5% 40px;display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:18px}
+.card{background:#fff;border-radius:20px;padding:16px;box-shadow:0 3px 15px #0000000d}.pic{height:150px;border-radius:15px;background:#f2f2f2;display:grid;place-items:center;font-size:75px}.card h3{margin:12px 0 5px}.price{font-weight:800;font-size:19px}.add{width:100%;margin-top:12px;background:#f1f1f1}.add:hover{background:#e63946;color:#fff}
+#modal{display:none;position:fixed;inset:0;background:#0008;z-index:10;padding:20px}.box{background:#fff;max-width:500px;margin:5vh auto;padding:25px;border-radius:22px;max-height:85vh;overflow:auto}
+.row{display:grid;grid-template-columns:1fr auto auto;gap:10px;align-items:center;border-bottom:1px solid #eee;padding:12px 0}.row button{padding:6px 10px;background:#eee}.row small{color:#777}.total{font-size:22px;font-weight:800;margin:18px 0}input,textarea{width:100%;padding:13px;margin:6px 0;border:1px solid #ddd;border-radius:10px} .send{width:100%;background:#e63946;color:#fff}
+.close{float:right;background:#eee}.empty{text-align:center;color:#777;padding:20px}
+</style>
+</head>
+<body>
+<header><div class="logo">Azamat <span>Food</span></div><button class="cart" onclick="openCart()">🛒 Себет (<b id="count">0</b>)</button></header>
+<section class="hero"><h1>Azamat Food 🍕</h1><p>Дәмді тағам — бір тапсырыста!</p></section>
+<div class="tabs">
+<button class="active" onclick="filter('all',this)">Барлығы</button><button onclick="filter('pizza',this)">🍕 Пицца</button>
+<button onclick="filter('burger',this)">🍔 Бургер</button><button onclick="filter('fries',this)">🍟 Фри</button><button onclick="filter('drink',this)">🥤 Сусын</button>
+</div>
+<main class="grid" id="grid"></main>
+
+<div id="modal"><div class="box"><button class="close" onclick="closeCart()">✕</button><h2>🛒 Себет</h2><div id="cart"></div><div class="total">Барлығы: <span id="total">0</span> ₸</div>
+<h3>Тапсырыс беру</h3><input id="name" placeholder="Атыңыз"><input id="phone" placeholder="Телефон нөмірі"><textarea id="address" placeholder="Мекенжай"></textarea>
+<button class="send" onclick="order()">Тапсырыс беру</button></div></div>
+
+<script>
+const products=[
+{id:1,n:"Пепперони",cat:"pizza",p:2800,e:"🍕"},{id:2,n:"4 ірімшік",cat:"pizza",p:3000,e:"🍕"},
+{id:3,n:"Чикен бургер",cat:"burger",p:1900,e:"🍔"},{id:4,n:"Чизбургер",cat:"burger",p:2100,e:"🍔"},
+{id:5,n:"Картоп фри",cat:"fries",p:900,e:"🍟"},{id:6,n:"Наггетс",cat:"fries",p:1200,e:"🍗"},
+{id:7,n:"Кола",cat:"drink",p:600,e:"🥤"},{id:8,n:"Лимонад",cat:"drink",p:700,e:"🍹"}];
+let cart=[];
+function render(list=products){grid.innerHTML=list.map(x=>`<div class="card"><div class="pic">${x.e}</div><h3>${x.n}</h3><div class="price">${x.p.toLocaleString()} ₸</div><button class="add" onclick="add(${x.id})">+ Себетке қосу</button></div>`).join("")}
+function add(id){let item=cart.find(x=>x.id===id);if(item)item.q++;else cart.push({...products.find(x=>x.id===id),q:1});update();drawCart()}
+function update(){count.textContent=cart.reduce((a,x)=>a+x.q,0)}
+function filter(cat,b){document.querySelectorAll('.tabs button').forEach(x=>x.classList.remove('active'));b.classList.add('active');render(cat==='all'?products:products.filter(x=>x.cat===cat))}
+function openCart(){modal.style.display="block";drawCart()}
+function closeCart(){modal.style.display="none"}
+function drawCart(){
+ if(!cart.length){document.getElementById('cart').innerHTML='<div class="empty">Себет бос 😔<br>Тағам таңдап көріңіз!</div>';document.getElementById('total').textContent='0';return}
+ let sum=0;
+ document.getElementById('cart').innerHTML=cart.map((x,i)=>{
+   sum+=x.p*x.q;
+   return `<div class="row"><span>${x.e} ${x.n}<br><small>${x.p.toLocaleString()} ₸ × ${x.q}</small></span>
+   <span><button onclick="changeQty(${i},-1)">−</button> <b>${x.q}</b> <button onclick="changeQty(${i},1)">+</button></span>
+   <b>${(x.p*x.q).toLocaleString()} ₸</b></div>`;
+ }).join("");
+ document.getElementById('total').textContent=sum.toLocaleString()
+}
+function changeQty(i,d){cart[i].q+=d;if(cart[i].q<=0)cart.splice(i,1);update();drawCart()}
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbygK7ORXrzae5pr4FSxWQRas_FGV8yuN051KGjLF_xMw5RPGIJD4Y0eKz7chL92aGA0/exec";
+
+async function order(){
+ if(!cart.length){alert("Алдымен тағам таңдаңыз.");return;}
+ const customerName=document.getElementById('name').value.trim();
+ const customerPhone=document.getElementById('phone').value.trim();
+ const customerAddress=document.getElementById('address').value.trim();
+ if(!customerName || !customerPhone || !customerAddress){
+   alert("Аты-жөніңіз, телефон және мекенжайды толтырыңыз.");
+   return;
+ }
+ const code=String(Math.floor(1000+Math.random()*9000));
+ const sum=cart.reduce((a,x)=>a+x.p*x.q,0);
+ const items=cart.map(x=>`${x.n} × ${x.q} = ${(x.p*x.q).toLocaleString()} ₸`).join("\n");
+ const payload={name:customerName,phone:customerPhone,address:customerAddress,items:items,total:sum,code:code};
+ try {
+   await fetch(WEB_APP_URL,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(payload)});
+   document.getElementById('receiptDetails').innerHTML=
+     `<b>Клиент:</b> ${customerName}<br><b>Телефон:</b> ${customerPhone}<br><b>Мекенжай:</b> ${customerAddress}<hr style="border:0;border-top:1px solid #ddd"><b>Барлығы:</b> ${sum.toLocaleString()} ₸`;
+   document.getElementById('orderCode').textContent=code;
+   document.getElementById('receiptModal').style.display='block';
+   document.getElementById('name').value="";
+   document.getElementById('phone').value="";
+   document.getElementById('address').value="";
+   cart=[];update();closeCart();
+ } catch(error) {
+   alert("Тапсырысты жіберу кезінде қате болды. Қайта көріңіз.");
+   console.error(error);
+ }
+}
+function closeReceipt(){document.getElementById('receiptModal').style.display='none'}
+render();
+</script>
+
+<div id="receiptModal" style="display:none;position:fixed;inset:0;background:#0009;z-index:20;padding:20px">
+  <div style="background:#fff;max-width:430px;margin:8vh auto;padding:28px 22px;border-radius:24px;text-align:center;box-shadow:0 10px 40px #0004">
+    <div style="font-size:48px">🧾</div>
+    <h2 style="margin:8px 0">Azamat Food</h2>
+    <p style="color:#666;margin-top:0">Тапсырысыңыз қабылданды!</p>
+    <div id="receiptDetails" style="text-align:left;background:#f7f7f7;border-radius:15px;padding:14px;margin:18px 0"></div>
+    <div style="font-size:14px;color:#666">Тапсырысты алу коды</div>
+    <div id="orderCode" style="font-size:42px;font-weight:900;letter-spacing:9px;margin:8px 0 4px"></div>
+    <div style="font-size:14px;color:#e63946;font-weight:700">📸 Кодты скриншоттап алыңыз,<br>тапсырысты алғанда көрсетіңіз.</div>
+    <button onclick="closeReceipt()" style="width:100%;margin-top:20px;background:#222;color:#fff">Жабу</button>
+  </div>
+</div>
+</body></html>
