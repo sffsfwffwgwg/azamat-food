@@ -3,28 +3,13 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Azamat Food — Тапсырыстар</title>
+<title>Azamat Food — TV</title>
 <style>
-*{box-sizing:border-box}body{margin:0;background:#070807;color:#fff;font-family:Arial,Helvetica,sans-serif;min-height:100vh;padding:30px}
-header{display:flex;justify-content:space-between;align-items:end;margin-bottom:26px}.brand{font-size:40px;font-weight:900}.brand span{color:#ffc21a}.sub{color:#999;font-size:20px;margin-top:7px}.clock{font-size:28px;font-weight:800;color:#ffc21a}
-.section{margin-bottom:34px}.section-title{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}.section-title h2{margin:0;font-size:28px}.count{color:#aaa;font-size:18px}
-.board{display:grid;grid-template-columns:repeat(auto-fit,minmax(310px,1fr));gap:18px}.card{background:linear-gradient(145deg,#1a1a18,#10110f);border:1px solid #343430;border-radius:24px;padding:23px;box-shadow:0 14px 45px #0008}.num{font-size:46px;font-weight:900;color:#ffc21a}.name{font-size:30px;font-weight:900;margin:8px 0 16px}.status{display:inline-block;border-radius:14px;padding:10px 15px;font-size:19px;font-weight:900;background:#30290e;color:#ffd13b}.ready{border-color:#396f43;background:linear-gradient(145deg,#142218,#0e130f)}.ready .status{background:#17351e;color:#65e07b}
-.empty{padding:32px;border:1px dashed #343430;border-radius:20px;color:#777;font-size:22px;text-align:center}.footer{position:fixed;right:28px;bottom:18px;color:#666;font-size:14px}
-@media(max-width:700px){body{padding:18px}.brand{font-size:30px}.clock{font-size:20px}.board{grid-template-columns:1fr}}
-</style>
-</head>
-<body>
-<header><div><div class="brand">🍔 AZAMAT <span>FOOD</span></div><div class="sub">Тапсырыстар тақтасы</div></div><div id="clock" class="clock"></div></header>
-<section class="section"><div class="section-title"><h2>👨‍🍳 Дайындалуда</h2><div id="preparingCount" class="count">0 тапсырыс</div></div><div id="preparingBoard" class="board"></div></section>
-<section class="section"><div class="section-title"><h2>🔔 Дайын болды</h2><div id="readyCount" class="count">0 тапсырыс</div></div><div id="readyBoard" class="board"></div></section>
-<div class="footer">Автоматты жаңарту: 2 секунд</div>
-<script>
-const API='https://script.google.com/macros/s/AKfycbygK7ORXrzae5pr4FSxWQRas_FGV8yuN051KGjLF_xMw5RPGIJD4Y0eKz7chL92aGA0/exec';
-function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
-function card(o,ready){return `<article class="card ${ready?'ready':''}"><div class="num">№ ${esc(o.orderNumber)}</div><div class="name">${esc(o.name)}</div><div class="status">${ready?'🔔 ТАПСЫРЫС ДАЙЫН!':'👨‍🍳 ДАЙЫНДАЛУДА'}</div></article>`}
-function empty(t){return `<div class="empty">${t}</div>`}
-async function load(){try{const r=await fetch(API+'?action=orders&ts='+Date.now(),{cache:'no-store'});const d=await r.json();const all=d.orders||[];const preparing=all.filter(x=>x.status!=='ready'&&x.status!=='done');const ready=all.filter(x=>x.status==='ready');document.getElementById('preparingBoard').innerHTML=preparing.length?preparing.map(o=>card(o,false)).join(''):empty('Қазір дайындалып жатқан тапсырыс жоқ');document.getElementById('readyBoard').innerHTML=ready.length?ready.map(o=>card(o,true)).join(''):empty('Дайын болған тапсырыс жоқ');document.getElementById('preparingCount').textContent=preparing.length+' тапсырыс';document.getElementById('readyCount').textContent=ready.length+' тапсырыс'}catch(e){document.getElementById('preparingBoard').innerHTML=empty('Серверге қосылу күтілуде…')}}
-function tick(){document.getElementById('clock').textContent=new Date().toLocaleTimeString('kk-KZ',{hour:'2-digit',minute:'2-digit',second:'2-digit'})}
-tick();setInterval(tick,1000);load();setInterval(load,2000);
-</script>
-</body></html>
+:root{--bg:#0b0b0a;--panel:#151514;--panel2:#191918;--line:#30302e;--text:#f5f5f3;--muted:#a5a5a1;--yellow:#ffc51b;--yellow2:#ffd43f;--green:#69df7b}
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden}
+body{font-family:Arial,Helvetica,sans-serif;background:radial-gradient(circle at 15% 0%,#171713 0,#0b0b0a 35%,#090909 100%);color:var(--text)}
+header{height:92px;padding:0 3.2%;display:flex;align-items:center;justify-content:space-between;background:rgba(10,10,9,.96);border-bottom:1px solid #2b2b29}
+.logo{display:flex;align-items:center;gap:12px;font-weight:900;line-height:.9;font-size:30px;letter-spacing:-1px;text-transform:uppercase}.logo:before{content:'🍔';display:grid;place-items:center;width:52px;height:52px;font-size:30px}.logo span{color:var(--yellow)}
+.sub{color:var(--muted);font-size:15px;margin-top:6px}.clock{font-size:25px;font-weight:900;color:var(--yellow)}
+main{height:calc(100vh - 92px);padding:24px 3.2% 28px}.top{display:flex;align-items:end;justify-content:space-between;margin-bottom:16px}.top h1{font-size:31px;margin:0;font-weight:900}.top h1:after{content:'';display:block;width:58px;height:4px;background:var(--yellow);margin-top:10px;border-radius:4px}
+.board{height:calc(100% - 70px);display:grid;grid-template-columns:1fr 1fr;gap:20px}.column{min-width:0;background:linear-gradient(145deg,#171716,#10110f);border:1px solid #30302d;border-radius:24px;padding:22px;box-shadow:0 14px 45px #
