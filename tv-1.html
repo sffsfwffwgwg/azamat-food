@@ -3,13 +3,21 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Azamat Food — TV</title>
+<title>Azamat Food TV</title>
 <style>
-:root{--bg:#0b0b0a;--panel:#151514;--panel2:#191918;--line:#30302e;--text:#f5f5f3;--muted:#a5a5a1;--yellow:#ffc51b;--yellow2:#ffd43f;--green:#69df7b}
-*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden}
-body{font-family:Arial,Helvetica,sans-serif;background:radial-gradient(circle at 15% 0%,#171713 0,#0b0b0a 35%,#090909 100%);color:var(--text)}
-header{height:92px;padding:0 3.2%;display:flex;align-items:center;justify-content:space-between;background:rgba(10,10,9,.96);border-bottom:1px solid #2b2b29}
-.logo{display:flex;align-items:center;gap:12px;font-weight:900;line-height:.9;font-size:30px;letter-spacing:-1px;text-transform:uppercase}.logo:before{content:'🍔';display:grid;place-items:center;width:52px;height:52px;font-size:30px}.logo span{color:var(--yellow)}
-.sub{color:var(--muted);font-size:15px;margin-top:6px}.clock{font-size:25px;font-weight:900;color:var(--yellow)}
-main{height:calc(100vh - 92px);padding:24px 3.2% 28px}.top{display:flex;align-items:end;justify-content:space-between;margin-bottom:16px}.top h1{font-size:31px;margin:0;font-weight:900}.top h1:after{content:'';display:block;width:58px;height:4px;background:var(--yellow);margin-top:10px;border-radius:4px}
-.board{height:calc(100% - 70px);display:grid;grid-template-columns:1fr 1fr;gap:20px}.column{min-width:0;background:linear-gradient(145deg,#171716,#10110f);border:1px solid #30302d;border-radius:24px;padding:22px;box-shadow:0 14px 45px #
+*{box-sizing:border-box}body{margin:0;background:#090909;color:white;font-family:Arial;height:100vh;overflow:hidden}header{height:90px;padding:20px 35px;display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid #292929}.logo{font-size:30px;font-weight:900}.logo b{color:#ffc21a}.clock{color:#ffc21a;font-size:25px;font-weight:bold}main{height:calc(100vh - 90px);padding:25px 30px}.board{height:100%;display:grid;grid-template-columns:1fr 1fr;gap:20px}.col{background:#151515;border:2px solid #292929;border-radius:22px;padding:22px}.col+ .col{border-color:#355d3b}.title{font-size:30px;font-weight:900;margin-bottom:20px}.card{background:#202020;border-radius:16px;padding:18px;margin-bottom:12px;font-size:30px;font-weight:900}.ready{background:#142217;color:#72e47f}.empty{color:#777;font-size:20px;text-align:center;margin-top:50px}@media(max-width:700px){.logo{font-size:22px}.clock{font-size:18px}header{padding:15px}.board{gap:10px}.col{padding:12px}.title{font-size:20px}.card{font-size:21px;padding:13px}}
+</style>
+</head>
+<body>
+<header><div class="logo">🍔 AZAMAT <b>FOOD</b></div><div id="clock" class="clock"></div></header>
+<main><div class="board">
+<section class="col"><div class="title">Дайындалуда</div><div id="prep" class="empty">Тапсырыс жоқ</div></section>
+<section class="col"><div class="title">Дайын</div><div id="ready" class="empty">Тапсырыс жоқ</div></section>
+</div></main>
+<script>
+const API='https://script.google.com/macros/s/AKfycbygK7ORXrzae5pr4FSxWQRas_FGV8yuN051KGjLF_xMw5RPGIJD4Y0eKz7chL92aGA0/exec';
+function clock(){document.getElementById('clock').textContent=new Date().toLocaleTimeString('kk-KZ')}setInterval(clock,1000);clock();
+async function load(){try{let r=await fetch(API+'?action=orders&t='+Date.now());let d=await r.json();let p=d.orders.filter(x=>x.status!=='ready'&&x.status!=='done'),q=d.orders.filter(x=>x.status==='ready');document.getElementById('prep').innerHTML=p.length?p.map(x=>'<div class="card">№'+x.orderNumber+' '+x.name+'</div>').join():'Тапсырыс жоқ';document.getElementById('ready').innerHTML=q.length?q.map(x=>'<div class="card ready">№'+x.orderNumber+' '+x.name+'</div>').join():'Тапсырыс жоқ'}catch(e){}}load();setInterval(load,2000);
+</script>
+</body>
+</html>
