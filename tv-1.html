@@ -1,23 +1,379 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="kk">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Azamat Food TV</title>
+
 <style>
-*{box-sizing:border-box}body{margin:0;background:#090909;color:white;font-family:Arial;height:100vh;overflow:hidden}header{height:90px;padding:20px 35px;display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid #292929}.logo{font-size:30px;font-weight:900}.logo b{color:#ffc21a}.clock{color:#ffc21a;font-size:25px;font-weight:bold}main{height:calc(100vh - 90px);padding:25px 30px}.board{height:100%;display:grid;grid-template-columns:1fr 1fr;gap:20px}.col{background:#151515;border:2px solid #292929;border-radius:22px;padding:22px}.col+ .col{border-color:#355d3b}.title{font-size:30px;font-weight:900;margin-bottom:20px}.card{background:#202020;border-radius:16px;padding:18px;margin-bottom:12px;font-size:30px;font-weight:900}.ready{background:#142217;color:#72e47f}.empty{color:#777;font-size:20px;text-align:center;margin-top:50px}@media(max-width:700px){.logo{font-size:22px}.clock{font-size:18px}header{padding:15px}.board{gap:10px}.col{padding:12px}.title{font-size:20px}.card{font-size:21px;padding:13px}}
+*{
+  box-sizing:border-box;
+}
+
+body{
+  margin:0;
+  background:#090909;
+  color:white;
+  font-family:Arial,sans-serif;
+  height:100vh;
+  overflow:hidden;
+}
+
+header{
+  height:90px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 35px;
+  border-bottom:2px solid #292929;
+}
+
+.logo{
+  font-size:32px;
+  font-weight:900;
+}
+
+.logo span{
+  color:#ffc400;
+}
+
+.clock{
+  color:#ffc400;
+  font-size:26px;
+  font-weight:bold;
+}
+
+main{
+  height:calc(100vh - 90px);
+  padding:25px;
+}
+
+.board{
+  width:100%;
+  height:100%;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:20px;
+}
+
+.column{
+  background:#151515;
+  border:2px solid #292929;
+  border-radius:22px;
+  padding:25px;
+  overflow:hidden;
+}
+
+.column.ready-column{
+  border-color:#355c3b;
+}
+
+.title{
+  font-size:32px;
+  font-weight:900;
+  margin-bottom:25px;
+}
+
+.order{
+  background:#222;
+  border-radius:16px;
+  padding:20px;
+  margin-bottom:15px;
+  font-size:32px;
+  font-weight:900;
+}
+
+.ready-column .order{
+  background:#162519;
+  color:#79e58a;
+}
+
+.empty{
+  text-align:center;
+  margin-top:60px;
+  color:#777;
+  font-size:22px;
+}
+
+@media(max-width:700px){
+
+  header{
+    height:65px;
+    padding:0 15px;
+  }
+
+  .logo{
+    font-size:21px;
+  }
+
+  .clock{
+    font-size:17px;
+  }
+
+  main{
+    height:calc(100vh - 65px);
+    padding:10px;
+  }
+
+  .board{
+    gap:10px;
+  }
+
+  .column{
+    padding:12px;
+    border-radius:15px;
+  }
+
+  .title{
+    font-size:20px;
+    margin-bottom:15px;
+  }
+
+  .order{
+    font-size:21px;
+    padding:13px;
+    border-radius:12px;
+  }
+
+  .empty{
+    font-size:16px;
+  }
+}
 </style>
 </head>
+
 <body>
-<header><div class="logo">🍔 AZAMAT <b>FOOD</b></div><div id="clock" class="clock"></div></header>
-<main><div class="board">
-<section class="col"><div class="title">Дайындалуда</div><div id="prep" class="empty">Тапсырыс жоқ</div></section>
-<section class="col"><div class="title">Дайын</div><div id="ready" class="empty">Тапсырыс жоқ</div></section>
-</div></main>
+
+<header>
+  <div class="logo">
+    🍔 AZAMAT <span>FOOD</span>
+  </div>
+
+  <div id="clock" class="clock"></div>
+</header>
+
+<main>
+
+  <div class="board">
+
+    <section class="column">
+      <div class="title">
+        Дайындалуда
+      </div>
+
+      <div id="preparing">
+        <div class="empty">
+          Тапсырыс жоқ
+        </div>
+      </div>
+    </section>
+
+
+    <section class="column ready-column">
+      <div class="title">
+        Дайын
+      </div>
+
+      <div id="ready">
+        <div class="empty">
+          Тапсырыс жоқ
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+</main>
+
+
 <script>
-const API='https://script.google.com/macros/s/AKfycbygK7ORXrzae5pr4FSxWQRas_FGV8yuN051KGjLF_xMw5RPGIJD4Y0eKz7chL92aGA0/exec';
-function clock(){document.getElementById('clock').textContent=new Date().toLocaleTimeString('kk-KZ')}setInterval(clock,1000);clock();
-async function load(){try{let r=await fetch(API+'?action=orders&t='+Date.now());let d=await r.json();let p=d.orders.filter(x=>x.status!=='ready'&&x.status!=='done'),q=d.orders.filter(x=>x.status==='ready');document.getElementById('prep').innerHTML=p.length?p.map(x=>'<div class="card">№'+x.orderNumber+' '+x.name+'</div>').join():'Тапсырыс жоқ';document.getElementById('ready').innerHTML=q.length?q.map(x=>'<div class="card ready">№'+x.orderNumber+' '+x.name+'</div>').join():'Тапсырыс жоқ'}catch(e){}}load();setInterval(load,2000);
+
+/* =========================
+   AZAMAT FOOD APPS SCRIPT
+   ========================= */
+
+const API =
+'https://script.google.com/macros/s/AKfycbyYx48fYTYzM6Yuukl2-Nb8_IqkUgyiRJgPRRBQs_RpMrHwcwdX39y9nt90wKQfFD8a/exec';
+
+
+/* =========================
+   САҒАТ
+   ========================= */
+
+function updateClock(){
+
+  const now = new Date();
+
+  document.getElementById('clock').textContent =
+    now.toLocaleTimeString('kk-KZ');
+
+}
+
+setInterval(updateClock,1000);
+
+updateClock();
+
+
+/* =========================
+   ТАПСЫРЫСТАРДЫ АЛУ
+   ========================= */
+
+async function loadOrders(){
+
+  try{
+
+    const response =
+      await fetch(
+        API + '?action=orders&t=' + Date.now()
+      );
+
+    const data =
+      await response.json();
+
+    if(!data.ok){
+      return;
+    }
+
+    const orders =
+      Array.isArray(data.orders)
+        ? data.orders
+        : [];
+
+
+    /*
+      ДАЙЫНДАЛУДА
+    */
+
+    const preparing =
+      orders.filter(order =>
+        order.status === 'preparing'
+      );
+
+
+    /*
+      ДАЙЫН
+    */
+
+    const ready =
+      orders.filter(order =>
+        order.status === 'ready'
+      );
+
+
+    renderPreparing(preparing);
+
+    renderReady(ready);
+
+  }catch(error){
+
+    console.log(
+      'TV байланыс қатесі:',
+      error
+    );
+
+  }
+
+}
+
+
+/* =========================
+   ДАЙЫНДАЛУДА
+   ========================= */
+
+function renderPreparing(orders){
+
+  const box =
+    document.getElementById('preparing');
+
+  if(!orders.length){
+
+    box.innerHTML =
+      '<div class="empty">Тапсырыс жоқ</div>';
+
+    return;
+  }
+
+
+  box.innerHTML =
+    orders
+      .map(order => {
+
+        return `
+          <div class="order">
+            №${order.orderNumber}
+            ${escapeHtml(order.name)}
+          </div>
+        `;
+
+      })
+      .join('');
+
+}
+
+
+/* =========================
+   ДАЙЫН
+   ========================= */
+
+function renderReady(orders){
+
+  const box =
+    document.getElementById('ready');
+
+  if(!orders.length){
+
+    box.innerHTML =
+      '<div class="empty">Тапсырыс жоқ</div>';
+
+    return;
+  }
+
+
+  box.innerHTML =
+    orders
+      .map(order => {
+
+        return `
+          <div class="order">
+            №${order.orderNumber}
+            ${escapeHtml(order.name)}
+          </div>
+        `;
+
+      })
+      .join('');
+
+}
+
+
+/* =========================
+   ҚАУІПСІЗ TEXT
+   ========================= */
+
+function escapeHtml(text){
+
+  return String(text || '')
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;')
+    .replace(/'/g,'&#039;');
+
+}
+
+
+/* =========================
+   АВТО ЖАҢАРТУ
+   ========================= */
+
+loadOrders();
+
+setInterval(
+  loadOrders,
+  2000
+);
+
 </script>
+
 </body>
-</html>
+  </html>
