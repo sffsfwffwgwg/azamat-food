@@ -342,6 +342,38 @@ add = function(id){
   oldAdd(id);
   localStorage.setItem("azamat_food_cart", JSON.stringify(cart));
 };
+  // Себетті cart.html-ге сақтау
+function saveCartToStorage(){
+  try{
+    localStorage.setItem(
+      "azamat_food_cart",
+      JSON.stringify(cart)
+    );
+  }catch(e){
+    console.error("Cart save error:",e);
+  }
+}
+
+// Тауар қосылған сайын сақтау
+const originalAdd = add;
+add = function(id){
+  originalAdd(id);
+  saveCartToStorage();
+};
+
+// Бет ашылғанда себетті қалпына келтіру
+try{
+  const saved = JSON.parse(
+    localStorage.getItem("azamat_food_cart") || "[]"
+  );
+  if(Array.isArray(saved)){
+    cart = saved;
+    update();
+    drawCart();
+  }
+}catch(e){
+  console.error("Cart load error:",e);
+}
 </script>
 
 <div id="receiptModal" style="display:none;position:fixed;inset:0;background:#0009;z-index:999999;padding:20px">
