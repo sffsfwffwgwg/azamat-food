@@ -257,7 +257,7 @@ function drawCart(){
  if(mobile) mobile.innerHTML=html+`<div class="total"><span>Барлығы:</span> <span>${sum.toLocaleString()} ₸</span></div>`;
 }
 function changeQty(i,d){cart[i].q+=d;if(cart[i].q<=0)cart.splice(i,1);update();drawCart()}
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbygK7ORXrzae5pr4FSxWQRas_FGV8yuN051KGjLF_xMw5RPGIJD4Y0eKz7chL92aGA0/exec";
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyYx48fYTYzM6Yuukl2-Nb8_IqkUgyiRJgPRRBQs_RpMrHwcwdX39y9nt90wKQfFD8a/exec";
 
 async function order(){
  if(!cart.length){alert("Алдымен тағам таңдаңыз.");return;}
