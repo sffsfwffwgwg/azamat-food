@@ -392,7 +392,8 @@ try{
   <script>
 localStorage.setItem("azamat_food_cart", JSON.stringify(cart));
     function openCartPage(){
-  location.href='cart.html?cart='+encodeURIComponent(JSON.stringify(cart));
+  localStorage.setItem("azamat_food_cart",JSON.stringify(cart));
+  location.href="cart.html";
     }
   </script>
 </body></html>
