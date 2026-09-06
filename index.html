@@ -243,10 +243,10 @@ function drawCart(){
  const checkout=document.getElementById('cartCheckout');
  if(!cart.length){
    if(mobile) mobile.innerHTML=empty;
-   if(checkout) checkout.style.display='none';
+   if(checkout) checkout.style.display='block';
    return;
  }
- if(checkout) checkout.style.display='none';
+ if(checkout) checkout.style.display='block';
  let sum=0;
  const html=cart.map((x,i)=>{
    sum+=x.p*x.q;
