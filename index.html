@@ -246,7 +246,7 @@ function drawCart(){
    if(checkout) checkout.style.display='none';
    return;
  }
- if(checkout) checkout.style.display='block';
+ if(checkout) checkout.style.display='none';
  let sum=0;
  const html=cart.map((x,i)=>{
    sum+=x.p*x.q;
