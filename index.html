@@ -278,7 +278,8 @@ const result=await response.json();
    document.getElementById('receiptDetails').innerHTML=
      `<b>Клиент:</b> ${customerName}<br><b>Телефон:</b> ${customerPhone}<br><hr style="border:0;border-top:1px solid #ddd"><b>Барлығы:</b> ${sum.toLocaleString()} ₸`;
    document.getElementById('orderCode').textContent=code;
-   document.getElementById('orderNumber').textContent='№'+result.orderNumber;
+   const orderNo = result.orderNumber || result.order?.orderNumber || result.data?.orderNumber || result.number;
+document.getElementById('orderNumber').textContent = orderNo ? '№'+orderNo : '';
    document.getElementById('receiptModal').style.display='block';
    document.querySelectorAll('nav').forEach(el=>el.style.display='none');
    document.getElementById('name').value="";
