@@ -329,6 +329,19 @@ setInterval(()=>{
     localStorage.setItem("azamat_food_cart", JSON.stringify(cart));
   }catch(e){}
 },200);
+  try{
+  const savedCart = JSON.parse(localStorage.getItem("azamat_food_cart") || "[]");
+  if(Array.isArray(savedCart)){
+    cart = savedCart;
+  }
+}catch(e){}
+
+const oldAdd = add;
+
+add = function(id){
+  oldAdd(id);
+  localStorage.setItem("azamat_food_cart", JSON.stringify(cart));
+};
 </script>
 
 <div id="receiptModal" style="display:none;position:fixed;inset:0;background:#0009;z-index:999999;padding:20px">
