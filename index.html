@@ -306,6 +306,19 @@ function showPage(page,btn){
 render();
 showPage('home',document.querySelector('nav a'));
 document.querySelector('.tabs button').classList.add('active');
+  try{
+  const savedCart = JSON.parse(localStorage.getItem("azamat_food_cart") || "[]");
+  if(Array.isArray(savedCart) && savedCart.length){
+    cart = savedCart;
+    update();
+  }
+}catch(e){}
+
+setInterval(()=>{
+  try{
+    localStorage.setItem("azamat_food_cart", JSON.stringify(cart));
+  }catch(e){}
+},200);
 </script>
 
 <div id="receiptModal" style="display:none;position:fixed;inset:0;background:#0009;z-index:999999;padding:20px">
