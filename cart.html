@@ -71,3 +71,10 @@ input{width:100%;margin-top:8px;padding:17px;border-radius:15px;border:1px solid
 
 <script>
 const WEB_APP_URL="https://script.google.com/macros/s/AKfycbyYx48fYTYzM6Yuukl2-Nb8_IqkUgyiRJgPRRBQs_RpMrHwcwdX
+  let cart=[];
+try{
+  const p=new URLSearchParams(location.search).get("cart");
+  cart=p ? JSON.parse(p) : JSON.parse(localStorage.getItem("azamat_food_cart")||"[]");
+}catch(e){
+  cart=[];
+  }
