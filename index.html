@@ -232,8 +232,18 @@ function filter(cat,btn){
   render(products.filter(x=>x.cat===cat));
 }
 function render(list=products){grid.innerHTML=list.map(x=>`<div class="card"><div class="pic">${x.e}</div><h3>${x.n}</h3><div class="price">${x.p.toLocaleString()} ₸</div><button class="add" onclick="add(${x.id})">+ Себетке қосу</button></div>`).join("")}
-function add(id){let item=cart.find(x=>x.id===id);if(item)item.q++;else cart.push({...products.find(x=>x.id===id),q:1});update();drawCart()}
-function update(){count.textContent=cart.reduce((a,x)=>a+x.q,0)}
+function add(id){
+  let item=cart.find(x=>x.id===id);
+  if(item)item.q++;
+  else cart.push({...products.find(x=>x.id===id),q:1});
+  localStorage.setItem("azamat_food_cart",JSON.stringify(cart));
+  update();
+  drawCart();
+}
+function update(){
+  count.textContent=cart.reduce((a,x)=>a+x.q,0);
+  localStorage.setItem("azamat_food_cart",JSON.stringify(cart));
+  }
 
 function openCart(){document.body.classList.add("cart-open");modal.style.display="block";drawCart()}
 function closeCart(){modal.style.display="none";document.body.classList.remove("cart-open")}
