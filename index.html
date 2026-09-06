@@ -171,7 +171,7 @@ body.cart-open{overflow:hidden!important}
     <a href="javascript:void(0)" onclick="showPage('menu',this)">Ас мәзірі</a>
     <a href="javascript:void(0)" onclick="showPage('contact',this)">Байланыс</a>
   </nav>
-  <button class="cart" onclick="location.href='cart.html'">🛒 Себет (<b id="count">0</b>)</button>
+  <button class="cart" onclick="openCartPage()">🛒 Себет (<b id="count">0</b>)</button>
 </header>
 <div id="top"></div>
 <main>
@@ -391,6 +391,9 @@ try{
 </div>
   <script>
 localStorage.setItem("azamat_food_cart", JSON.stringify(cart));
+    function openCartPage(){
+  location.href='cart.html?cart='+encodeURIComponent(JSON.stringify(cart));
+    }
   </script>
 </body></html>
 
