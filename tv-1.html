@@ -2,141 +2,146 @@
 <html lang="kk">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>Azamat Food TV</title>
 
 <style>
 *{
   box-sizing:border-box;
+  margin:0;
+  padding:0;
 }
 
 body{
-  margin:0;
-  background:#090909;
-  color:white;
-  font-family:Arial,sans-serif;
-  height:100vh;
-  overflow:hidden;
+  background:#111;
+  color:#fff;
+  font-family:Arial,Helvetica,sans-serif;
+  min-height:100vh;
 }
 
-header{
-  height:90px;
+.header{
+  height:100px;
   display:flex;
   align-items:center;
-  justify-content:space-between;
-  padding:0 35px;
+  justify-content:center;
   border-bottom:2px solid #292929;
+  background:#151515;
 }
 
 .logo{
-  font-size:32px;
+  font-size:42px;
   font-weight:900;
+  color:#fff;
+  letter-spacing:1px;
 }
 
 .logo span{
-  color:#ffc400;
+  color:#ffb000;
 }
 
-.clock{
-  color:#ffc400;
-  font-size:26px;
-  font-weight:bold;
-}
-
-main{
-  height:calc(100vh - 90px);
-  padding:25px;
-}
-
-.board{
-  width:100%;
-  height:100%;
+.main{
   display:grid;
   grid-template-columns:1fr 1fr;
-  gap:20px;
+  gap:25px;
+  padding:25px;
+  min-height:calc(100vh - 100px);
 }
 
 .column{
-  background:#151515;
-  border:2px solid #292929;
+  background:#191919;
   border-radius:22px;
   padding:25px;
-  overflow:hidden;
-}
-
-.column.ready-column{
-  border-color:#355c3b;
+  border:1px solid #292929;
 }
 
 .title{
-  font-size:32px;
+  text-align:center;
+  font-size:34px;
   font-weight:900;
-  margin-bottom:25px;
+  margin-bottom:22px;
+}
+
+.preparing .title{
+  color:#ffb000;
+}
+
+.ready .title{
+  color:#39e66b;
+}
+
+.orders{
+  display:flex;
+  flex-direction:column;
+  gap:14px;
 }
 
 .order{
-  background:#222;
+  background:#242424;
   border-radius:16px;
-  padding:20px;
-  margin-bottom:15px;
-  font-size:32px;
+  padding:22px 25px;
+  font-size:30px;
+  font-weight:800;
+  border-left:6px solid #555;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  min-height:78px;
+}
+
+.preparing .order{
+  border-left-color:#ffb000;
+}
+
+.ready .order{
+  border-left-color:#39e66b;
+}
+
+.number{
+  font-size:36px;
   font-weight:900;
 }
 
-.ready-column .order{
-  background:#162519;
-  color:#79e58a;
+.name{
+  text-align:right;
+  margin-left:15px;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
 }
 
 .empty{
   text-align:center;
-  margin-top:60px;
   color:#777;
-  font-size:22px;
+  font-size:25px;
+  padding:50px 10px;
 }
 
-@media(max-width:700px){
+.timer{
+  font-size:18px;
+  color:#888;
+  margin-left:15px;
+  white-space:nowrap;
+}
 
-  header{
-    height:65px;
-    padding:0 15px;
+@media(max-width:800px){
+  .main{
+    grid-template-columns:1fr;
   }
 
   .logo{
-    font-size:21px;
-  }
-
-  .clock{
-    font-size:17px;
-  }
-
-  main{
-    height:calc(100vh - 65px);
-    padding:10px;
-  }
-
-  .board{
-    gap:10px;
-  }
-
-  .column{
-    padding:12px;
-    border-radius:15px;
+    font-size:32px;
   }
 
   .title{
-    font-size:20px;
-    margin-bottom:15px;
+    font-size:28px;
   }
 
   .order{
-    font-size:21px;
-    padding:13px;
-    border-radius:12px;
+    font-size:24px;
   }
 
-  .empty{
-    font-size:16px;
+  .number{
+    font-size:29px;
   }
 }
 </style>
@@ -144,79 +149,265 @@ main{
 
 <body>
 
-<header>
-  <div class="logo">
-    🍔 AZAMAT <span>FOOD</span>
-  </div>
-
-  <div id="clock" class="clock"></div>
+<header class="header">
+  <div class="logo">Azamat <span>Food</span></div>
 </header>
 
-<main>
+<main class="main">
 
-  <div class="board">
+  <section class="column preparing">
+    <div class="title">Дайындалуда</div>
+    <div id="preparingOrders" class="orders">
+      <div class="empty">Тапсырыстар жоқ</div>
+    </div>
+  </section>
 
-    <section class="column">
-      <div class="title">
-        Дайындалуда
-      </div>
-
-      <div id="preparing">
-        <div class="empty">
-          Тапсырыс жоқ
-        </div>
-      </div>
-    </section>
-
-
-    <section class="column ready-column">
-      <div class="title">
-        Дайын
-      </div>
-
-      <div id="ready">
-        <div class="empty">
-          Тапсырыс жоқ
-        </div>
-      </div>
-    </section>
-
-  </div>
+  <section class="column ready">
+    <div class="title">Дайын</div>
+    <div id="readyOrders" class="orders">
+      <div class="empty">Тапсырыстар жоқ</div>
+    </div>
+  </section>
 
 </main>
 
-
 <script>
-
-/* =========================
-   AZAMAT FOOD APPS SCRIPT
-   ========================= */
 
 const API =
 'https://script.google.com/macros/s/AKfycbyYx48fYTYzM6Yuukl2-Nb8_IqkUgyiRJgPRRBQs_RpMrHwcwdX39y9nt90wKQfFD8a/exec';
 
+const READY_TIME = 4 * 60 * 1000;
 
-/* =========================
-   САҒАТ
-   ========================= */
+const TIMER_KEY = 'azamat_food_tv_ready_timers';
 
-function updateClock(){
-
-  const now = new Date();
-
-  document.getElementById('clock').textContent =
-    now.toLocaleTimeString('kk-KZ');
-
+function getTimers(){
+  try{
+    return JSON.parse(
+      localStorage.getItem(TIMER_KEY) || '{}'
+    );
+  }catch(e){
+    return {};
+  }
 }
 
-setInterval(updateClock,1000);
+function saveTimers(timers){
+  try{
+    localStorage.setItem(
+      TIMER_KEY,
+      JSON.stringify(timers)
+    );
+  }catch(e){}
+}
 
-updateClock();
+function getReadyTime(order,timers){
+  const key = String(order.orderNumber);
 
+  /*
+    Егер backend readyAt берсе,
+    нақты дайын болған уақытты қолданамыз.
+  */
+  if(order.readyAt){
+    const time =
+      new Date(order.readyAt).getTime();
 
-/* =========================
-   ТАПСЫРЫСТАРДЫ АЛУ
-   ========================= */
+    if(!isNaN(time)){
+      timers[key] = time;
+      return time;
+    }
+  }
+
+  /*
+    Ескі тапсырыстарда readyAt болмаса,
+    TV алғаш көрген уақытты қолданамыз.
+  */
+  if(!timers[key]){
+    timers[key] = Date.now();
+  }
+
+  return timers[key];
+}
+
+function createOrder(order,showTimer){
+
+  const box = document.createElement('div');
+  box.className = 'order';
+
+  const number =
+    document.createElement('div');
+
+  number.className = 'number';
+  number.textContent =
+    '№' + order.orderNumber;
+
+  const right =
+    document.createElement('div');
+
+  right.style.display = 'flex';
+  right.style.alignItems = 'center';
+
+  const name =
+    document.createElement('div');
+
+  name.className = 'name';
+  name.textContent =
+    order.name || '';
+
+  right.appendChild(name);
+
+  if(showTimer){
+
+    const timer =
+      document.createElement('div');
+
+    timer.className = 'timer';
+
+    timer.dataset.readyTime =
+      getReadyTime(
+        order,
+        window.currentTimers
+      );
+
+    right.appendChild(timer);
+
+    updateTimer(timer);
+  }
+
+  box.appendChild(number);
+  box.appendChild(right);
+
+  return box;
+}
+
+function updateTimer(element){
+
+  const readyTime =
+    Number(element.dataset.readyTime);
+
+  const left =
+    READY_TIME - (Date.now() - readyTime);
+
+  if(left <= 0){
+    element.textContent = '';
+    return;
+  }
+
+  const seconds =
+    Math.ceil(left / 1000);
+
+  const minutes =
+    Math.floor(seconds / 60);
+
+  const sec =
+    seconds % 60;
+
+  element.textContent =
+    minutes + ':' +
+    String(sec).padStart(2,'0');
+}
+
+function renderOrders(orders){
+
+  const preparingBox =
+    document.getElementById(
+      'preparingOrders'
+    );
+
+  const readyBox =
+    document.getElementById(
+      'readyOrders'
+    );
+
+  preparingBox.innerHTML = '';
+  readyBox.innerHTML = '';
+
+  window.currentTimers =
+    getTimers();
+
+  const now = Date.now();
+
+  const preparing =
+    orders.filter(order =>
+      order.status === 'preparing'
+    );
+
+  const ready = [];
+
+  orders
+    .filter(order =>
+      order.status === 'ready'
+    )
+    .forEach(order => {
+
+      const readyTime =
+        getReadyTime(
+          order,
+          window.currentTimers
+        );
+
+      if(
+        now - readyTime <
+        READY_TIME
+      ){
+        ready.push(order);
+      }
+
+    });
+
+  /*
+    Ескірген timer-лерді тазалау.
+  */
+  Object.keys(window.currentTimers)
+    .forEach(key => {
+
+      const time =
+        Number(window.currentTimers[key]);
+
+      if(
+        !time ||
+        now - time >= READY_TIME
+      ){
+        delete window.currentTimers[key];
+      }
+
+    });
+
+  saveTimers(window.currentTimers);
+
+  if(preparing.length === 0){
+
+    preparingBox.innerHTML =
+      '<div class="empty">Тапсырыстар жоқ</div>';
+
+  }else{
+
+    preparing.forEach(order => {
+
+      preparingBox.appendChild(
+        createOrder(order,false)
+      );
+
+    });
+
+  }
+
+  if(ready.length === 0){
+
+    readyBox.innerHTML =
+      '<div class="empty">Тапсырыстар жоқ</div>';
+
+  }else{
+
+    ready.forEach(order => {
+
+      readyBox.appendChild(
+        createOrder(order,true)
+      );
+
+    });
+
+  }
+
+}
 
 async function loadOrders(){
 
@@ -224,50 +415,38 @@ async function loadOrders(){
 
     const response =
       await fetch(
-        API + '?action=orders&t=' + Date.now()
+        API + '?action=getOrders&v=' +
+        Date.now(),
+        {
+          cache:'no-store'
+        }
       );
 
     const data =
       await response.json();
 
-    if(!data.ok){
+    if(Array.isArray(data)){
+      renderOrders(data);
       return;
     }
 
-    const orders =
+    if(
+      data &&
       Array.isArray(data.orders)
-        ? data.orders
-        : [];
+    ){
+      renderOrders(data.orders);
+      return;
+    }
 
-
-    /*
-      ДАЙЫНДАЛУДА
-    */
-
-    const preparing =
-      orders.filter(order =>
-        order.status === 'preparing'
-      );
-
-
-    /*
-      ДАЙЫН
-    */
-
-    const ready =
-      orders.filter(order =>
-        order.status === 'ready'
-      );
-
-
-    renderPreparing(preparing);
-
-    renderReady(ready);
+    console.log(
+      'Orders format:',
+      data
+    );
 
   }catch(error){
 
     console.log(
-      'TV байланыс қатесі:',
+      'TV connection error:',
       error
     );
 
@@ -275,97 +454,21 @@ async function loadOrders(){
 
 }
 
+/*
+  Таймерді әр секунд жаңартамыз.
+*/
+setInterval(() => {
 
-/* =========================
-   ДАЙЫНДАЛУДА
-   ========================= */
+  document
+    .querySelectorAll('.timer')
+    .forEach(updateTimer);
 
-function renderPreparing(orders){
+},1000);
 
-  const box =
-    document.getElementById('preparing');
-
-  if(!orders.length){
-
-    box.innerHTML =
-      '<div class="empty">Тапсырыс жоқ</div>';
-
-    return;
-  }
-
-
-  box.innerHTML =
-    orders
-      .map(order => {
-
-        return `
-          <div class="order">
-            №${order.orderNumber}
-            ${escapeHtml(order.name)}
-          </div>
-        `;
-
-      })
-      .join('');
-
-}
-
-
-/* =========================
-   ДАЙЫН
-   ========================= */
-
-function renderReady(orders){
-
-  const box =
-    document.getElementById('ready');
-
-  if(!orders.length){
-
-    box.innerHTML =
-      '<div class="empty">Тапсырыс жоқ</div>';
-
-    return;
-  }
-
-
-  box.innerHTML =
-    orders
-      .map(order => {
-
-        return `
-          <div class="order">
-            №${order.orderNumber}
-            ${escapeHtml(order.name)}
-          </div>
-        `;
-
-      })
-      .join('');
-
-}
-
-
-/* =========================
-   ҚАУІПСІЗ TEXT
-   ========================= */
-
-function escapeHtml(text){
-
-  return String(text || '')
-    .replace(/&/g,'&amp;')
-    .replace(/</g,'&lt;')
-    .replace(/>/g,'&gt;')
-    .replace(/"/g,'&quot;')
-    .replace(/'/g,'&#039;');
-
-}
-
-
-/* =========================
-   АВТО ЖАҢАРТУ
-   ========================= */
-
+/*
+  Backend-тен тапсырыстарды
+  әр 2 секунд сайын аламыз.
+*/
 loadOrders();
 
 setInterval(
@@ -376,4 +479,4 @@ setInterval(
 </script>
 
 </body>
-  </html>
+</html>
