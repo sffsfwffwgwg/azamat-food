@@ -273,10 +273,12 @@ async function order(){
  const items=cart.map(x=>`${x.n} × ${x.q} = ${(x.p*x.q).toLocaleString()} ₸`).join("\n");
  const payload={name:customerName,phone:customerPhone,address:customerAddress,items:items,total:sum,code:code};
  try {
-   await fetch(WEB_APP_URL,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(payload)});
+   const response=await fetch(WEB_APP_URL,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(payload)});
+const result=await response.json();
    document.getElementById('receiptDetails').innerHTML=
      `<b>Клиент:</b> ${customerName}<br><b>Телефон:</b> ${customerPhone}<br><hr style="border:0;border-top:1px solid #ddd"><b>Барлығы:</b> ${sum.toLocaleString()} ₸`;
    document.getElementById('orderCode').textContent=code;
+   document.getElementById('orderNumber').textContent='№'+result.orderNumber;
    document.getElementById('receiptModal').style.display='block';
    document.getElementById('name').value="";
    document.getElementById('phone').value="";
@@ -286,7 +288,10 @@ async function order(){
    console.error(error);
  }
 }
-function closeReceipt(){document.getElementById('receiptModal').style.display='none'}
+  function closeReceipt(){
+  document.getElementById('receiptModal').style.display='none';
+  document.querySelectorAll('nav').forEach(el=>el.style.display='flex');
+  }
 function showPage(page,btn){
   const ids=['homePage','contactPage','menuPage'];
   ids.forEach(id=>{const el=document.getElementById(id); if(el) el.style.display='none';});
@@ -311,7 +316,7 @@ document.querySelector('.tabs button').classList.add('active');
     <div id="orderCode" style="font-size:42px;font-weight:900;letter-spacing:9px;margin:8px 0 4px"></div>
     <div id="orderNumber" style="font-size:24px;font-weight:900;margin:10px 0"></div>
     <div style="font-size:14px;color:#e63946;font-weight:700">📸 Кодты скриншоттап алыңыз,<br>тапсырысты алғанда көрсетіңіз.</div>
-    <button onclick="closeReceipt()" style="width:100%;margin-top:20px;background:#222;color:#fff">Жабу</button>
+    <button onclick="closeReceipt()" style="width:100%;margin-top:24px;background:#222;color:#fff;padding:18px 20px;border:0;border-radius:22px;font-size:20px;font-weight:800;min-height:62px">Жабу</button>
   </div>
 </div>
 </body></html>
