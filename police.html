@@ -293,10 +293,10 @@ body.panel-mode .logo{padding-right:0}
 
 <footer>© 2026 POLICE DEMO PORTAL</footer>
 
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-app.js";
-import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-auth.js";
-import { getDatabase, ref, set, onValue, onDisconnect, remove } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-database.js";
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
+<script>
 
 const firebaseConfig = {
   apiKey: "AIzaSyDmX0YyBjvPx4JR9HerwMi9j3Zeg7JAbgc",
@@ -307,36 +307,36 @@ const firebaseConfig = {
   appId: "1:544142599857:web:41b04cdbff540cebffe490",
   databaseURL: "https://police-demo-29cf0-default-rtdb.firebaseio.com/"
 };
-const firebaseApp = initializeApp(firebaseConfig);
-const firebaseAuth = getAuth(firebaseApp);
-const firebaseDb = getDatabase(firebaseApp);
+const firebaseApp = firebase.initializeApp(firebaseConfig);
+const firebaseAuth = firebase.auth();
+const firebaseDb = firebase.database();
 let firebaseReady = false;
 let firebaseUid = null;
 
-function firebasePath(path){ return ref(firebaseDb, path); }
+function firebasePath(path){ return firebaseDb.ref(path); }
 function cleanRemoteArray(v){ return Array.isArray(v) ? v : (v && typeof v==='object' ? Object.values(v) : []); }
 async function pushSharedState(){
   if(!firebaseReady) return;
   try {
     await Promise.all([
-      set(firebasePath('policeDemo/people'), people),
-      set(firebasePath('policeDemo/staff'), staff),
-      set(firebasePath('policeDemo/complaints'), complaints)
+      firebasePath('policeDemo/people').set(people),
+      firebasePath('policeDemo/staff').set(staff),
+      firebasePath('policeDemo/complaints').set(complaints)
     ]);
   } catch(err){ console.warn('Firebase sync error:', err); }
 }
 function startRealtime(){
-  onValue(firebasePath('policeDemo/people'), snap=>{
+  firebasePath('policeDemo/people').on('value', snap=>{
     if(snap.exists()){ people=cleanRemoteArray(snap.val()); localStorage.setItem('policeDemoPeople',JSON.stringify(people)); renderAdmin(); renderWanted(); }
-    else set(firebasePath('policeDemo/people'), people);
+    else firebasePath('policeDemo/people').set(people);
   });
-  onValue(firebasePath('policeDemo/staff'), snap=>{
+  firebasePath('policeDemo/staff').on('value', snap=>{
     if(snap.exists()){ staff=cleanRemoteArray(snap.val()); localStorage.setItem('policeDemoStaff',JSON.stringify(staff)); renderOfficerRegistration(); }
-    else set(firebasePath('policeDemo/staff'), staff);
+    else firebasePath('policeDemo/staff').set(staff);
   });
-  onValue(firebasePath('policeDemo/complaints'), snap=>{
+  firebasePath('policeDemo/complaints').on('value', snap=>{
     if(snap.exists()){ complaints=cleanRemoteArray(snap.val()); localStorage.setItem('policeDemoComplaints',JSON.stringify(complaints)); renderComplaints(); }
-    else set(firebasePath('policeDemo/complaints'), complaints);
+    else firebasePath('policeDemo/complaints').set(complaints);
   });
 }
 function startPresence(){
@@ -345,16 +345,16 @@ function startPresence(){
   const saved=JSON.parse(localStorage.getItem('policeDemoOfficer')||'null');
   const name=(saved&&saved.name)?saved.name:'Қонақ';
   const data={name,at:Date.now()};
-  onDisconnect(presenceRef).remove().catch(()=>{});
+  presenceRef.onDisconnect().remove().catch(()=>{});
   set(presenceRef,data).catch(()=>{});
-  onValue(firebasePath('policeDemo/presence'),snap=>{
+  firebasePath('policeDemo/presence').on('value',snap=>{
     const list=snap.exists()?Object.values(snap.val()):[];
     const el=document.getElementById('onlinePlayers');
     if(el) el.textContent='🟢 Онлайн: '+list.length;
   });
 }
-signInAnonymously(firebaseAuth).catch(err=>console.warn('Firebase auth:',err));
-onAuthStateChanged(firebaseAuth,user=>{
+firebaseAuth.signInAnonymously().catch(err=>console.warn('Firebase auth:',err));
+firebaseAuth.onAuthStateChanged(user=>{
   if(!user) return;
   firebaseUid=user.uid; firebaseReady=true;
   startRealtime(); startPresence();
@@ -385,7 +385,7 @@ function confirmFireOfficer(){
   if(saved){
     staff=staff.filter(x=>String(x.name||'').toLowerCase()!==String(saved.name||'').toLowerCase());
     localStorage.setItem('policeDemoStaff',JSON.stringify(staff));
-    if(firebaseReady) set(firebasePath('policeDemo/staff'),staff).catch(()=>{});
+    if(firebaseReady) firebasePath('policeDemo/staff').set(staff).catch(()=>{});
   }
   localStorage.removeItem('policeDemoOfficer');
   closeFireOfficer();
@@ -434,245 +434,4 @@ function generateEmployeeId(){
  let max=1000;
  staff.forEach(x=>{
    const m=String(x.id||'').match(/POL-(\d+)/);
-   if(m) max=Math.max(max,Number(m[1]));
- });
- return 'POL-'+(max+1);
-}
-
-function finishRegistration(){
- const name=document.getElementById('regName').value.trim();
- if(!name){
-   document.getElementById('regError').textContent='Аты-жөнін енгізіңіз.';
-   return;
- }
- const existing=staff.find(x=>x.name.toLowerCase()===name.toLowerCase());
- const officer=existing || {name,id:generateEmployeeId()};
- if(!existing) staff.push(officer);
- localStorage.setItem('policeDemoStaff',JSON.stringify(staff));
- localStorage.setItem('policeDemoOfficer',JSON.stringify(officer));
- if(firebaseReady) set(firebasePath('policeDemo/staff'),staff).catch(()=>{});
- closeRegister();
- show('admin');
- document.getElementById('registeredOfficer').textContent='Кірген қызметкер: '+officer.name+' • '+officer.id;
- showAdminPart('complaints');
- renderComplaints(); renderAdmin(); renderOfficerRegistration();
-}
-
-function closePin(){document.getElementById('pinOverlay').style.display='none';}
-function checkPin(){
- const pin=document.getElementById('pinInput').value;
- if(pin==='911'){
-   closePin();
-   const saved=JSON.parse(localStorage.getItem('policeDemoOfficer')||'null');
-   const current=saved && staff.find(x=>x.name.toLowerCase()===String(saved.name||'').toLowerCase());
-   if(current){
-     localStorage.setItem('policeDemoOfficer',JSON.stringify(current));
-     show('admin');
-     document.getElementById('registeredOfficer').textContent='Кірген қызметкер: '+current.name+' • '+current.id;
-     showAdminPart('complaints');
-     renderComplaints(); renderAdmin(); renderOfficerRegistration();
-   } else {
-     openRegistration();
-   }
- } else {
-   document.getElementById('pinError').textContent='PIN коды қате. Қайта көріңіз.';
-   document.getElementById('pinInput').value='';
-   document.getElementById('pinInput').focus();
- }
-}
-let people=JSON.parse(localStorage.getItem('policeDemoPeople')||'[]');
-function addPerson(e){
- e.preventDefault();
- const name=document.getElementById('name').value.trim(),file=document.getElementById('photo').files[0];
- const score=Number(document.getElementById('score').value||50);
- const save=photo=>{people.push({id:Date.now(),name,photo:photo||'',score});saveData();e.target.reset();document.getElementById('score').value=50;document.getElementById('scoreValue').textContent='50';};
- if(file){const r=new FileReader();r.onload=()=>save(r.result);r.readAsDataURL(file)}else save('');
-}
-function saveData(){
- localStorage.setItem('policeDemoPeople',JSON.stringify(people));
- renderAdmin();
- renderWanted();
- if(firebaseReady) set(firebasePath('policeDemo/people'),people).catch(()=>{});
-}
-function toggleAddCriminal(){
- const form=document.getElementById('addCriminalForm');
- if(!form) return;
- form.style.display=form.style.display==='none'?'block':'none';
- if(form.style.display==='block'){
-   document.getElementById('name').focus();
- }
-}
-function difficulty(score){
- score=Number(score||50);
- if(score<=30) return '🟢 Оңай деңгей';
- if(score<=70) return '🟡 Орташа деңгей';
- return '🔴 Қиын деңгей';
-}
-function renderWanted(){
- const box=document.getElementById('wantedList');
- if(!box) return;
- box.innerHTML='';
- if(!people.length){
-   box.innerHTML='<div class="card"><p class="muted">Әзірге іздеудегі адам жоқ.</p></div>';
-   return;
- }
- people.forEach(x=>{
-   const c=document.createElement('div');
-   c.className='card';
-   c.innerHTML=(x.photo?'<img src="'+x.photo+'" style="width:100%;max-height:260px;object-fit:cover;border-radius:16px;margin-bottom:14px">':'')+
-     '<h3>'+esc(x.name)+'</h3>'+
-     '<p class="muted">Іздеудегі адам</p>'+
-     '<div class="score-badge">'+difficulty(x.score)+'</div>';
-   box.appendChild(c);
- });
-}
-function renderAdmin(){
- const box=document.getElementById('adminList');box.innerHTML='';
- people.forEach(x=>{
-  const c=document.createElement('div');c.className='card admin-card';
-  c.innerHTML=(x.photo?'<img src="'+x.photo+'">':'')+
-  '<h3>'+esc(x.name)+'</h3>'+
-  '<div class="score-badge">🎯 '+difficulty(x.score)+'</div>'+
-  '<div class="actions">'+
-  '<button class="btn" onclick="renamePerson('+x.id+')">✏️ Өзгерту</button>'+
-  '<button class="btn action-btn photo" onclick="changePhoto('+x.id+')">🖼️ Фото</button>'+
-  '<button class="btn" onclick="deletePerson('+x.id+')">🗑️ Өшіру</button></div>';
-  box.appendChild(c);
- });
-}
-let pendingRenameId=null;
-function renamePerson(id){
- const x=people.find(a=>a.id===id); if(!x)return;
- pendingRenameId=id;
- document.getElementById('customInput').value=x.name||'';
- document.getElementById('inputOverlay').style.display='flex';
- setTimeout(()=>document.getElementById('customInput').focus(),50);
-}
-function closeInputDialog(){pendingRenameId=null;document.getElementById('inputOverlay').style.display='none';}
-function confirmInput(){
- if(pendingRenameId===null)return;
- const x=people.find(a=>a.id===pendingRenameId);
- const n=document.getElementById('customInput').value.trim();
- if(x&&n){x.name=n;saveData();}
- closeInputDialog();
-}
-function changePhoto(id){
- const i=document.createElement('input');i.type='file';i.accept='image/*';
- i.onchange=()=>{const f=i.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{people.find(a=>a.id===id).photo=r.result;saveData()};r.readAsDataURL(f)};
- i.click();
-}
-let pendingDeleteIndex=null;
-function deletePerson(id){
-  pendingDeleteIndex=people.findIndex(x=>x.id===id);
-  if(pendingDeleteIndex<0)return;
-  document.getElementById('confirmOverlay').style.display='flex';
-}
-function closeConfirm(){
-  pendingDeleteIndex=null;
-  document.getElementById('confirmOverlay').style.display='none';
-}
-function confirmDelete(){
-  if(pendingDeleteIndex===null) return;
-  people.splice(pendingDeleteIndex,1);
-  saveData();
-  closeConfirm();
-}
-function esc(s){return s.replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));}
-
-function showAdminPart(id){
- document.querySelectorAll('.adminPart').forEach(x=>x.style.display='none');
- document.getElementById(id).style.display='block';
- if(id==='criminals') renderAdmin();
- if(id==='complaints') renderComplaints();
- if(id==='officers') renderOfficerRegistration();
-}
-function renderOfficerRegistration(){
- const box=document.getElementById('officerList');
- const pub=document.getElementById('publicStaffList');
- const saved=JSON.parse(localStorage.getItem('policeDemoOfficer')||'null');
- const current=document.getElementById('registeredOfficer');
- const empty='<div class="card"><p class="muted">Әзірге тіркелген қызметкер жоқ.</p></div>';
- if(saved && current) current.textContent='Кірген қызметкер: '+saved.name+' • '+saved.id;
- if(!box) return;
- box.innerHTML='';
- if(pub) pub.innerHTML='';
- if(!staff.length){
-   box.innerHTML=empty;
-   if(pub) pub.innerHTML=empty;
-   return;
- }
- staff.forEach(x=>{
-   const panelHtml='<div class="card"><h3>'+esc(x.name)+'</h3><p>Полиция қызметкері</p><span class="muted">ID: '+esc(x.id)+'</span></div>';
-   const publicHtml='<div class="card"><h3>'+esc(x.name)+'</h3><p>Полиция қызметкері</p></div>';
-   box.insertAdjacentHTML('beforeend',panelHtml);
-   if(pub) pub.insertAdjacentHTML('beforeend',publicHtml);
- });
-}
-renderWanted();
-renderOfficerRegistration();
-
-let complaints=JSON.parse(localStorage.getItem('policeDemoComplaints')||'[]');
-function submitComplaint(e){
- e.preventDefault();
- const inputs=e.target.querySelectorAll('input,textarea');
- complaints.push({name:inputs[0].value,email:inputs[1].value,text:inputs[2].value,date:new Date().toLocaleString()});
- localStorage.setItem('policeDemoComplaints',JSON.stringify(complaints));
- if(firebaseReady) set(firebasePath('policeDemo/complaints'),complaints).catch(()=>{});
- alert('Өтініш демо режимінде қабылданды!');
- e.target.reset();
-}
-function renderComplaints(){
- const box=document.getElementById('complaintList'); box.innerHTML='';
- if(!complaints.length){box.innerHTML='<p class="muted">Әзірге шағым жоқ.</p>';return;}
- complaints.forEach((x,i)=>{
-  const c=document.createElement('div');c.className='card';c.style.marginTop='10px';
-  c.innerHTML='<h3>'+esc(x.name)+'</h3><div class="muted">'+esc(x.email)+' • '+esc(x.date)+'</div><p>'+esc(x.text)+'</p><button class="btn" onclick="deleteComplaint('+i+')">🗑️ Өшіру</button>';
-  box.appendChild(c);
- });
-}
-function deleteComplaint(i){complaints.splice(i,1);localStorage.setItem('policeDemoComplaints',JSON.stringify(complaints));if(firebaseReady) set(firebasePath('policeDemo/complaints'),complaints).catch(()=>{});renderComplaints();}
-
-Object.assign(window,{
-  show,adminLogin,closePin,checkPin,closeRegister,finishRegistration,
-  logoutOfficer,openFireOfficer,closeFireOfficer,confirmFireOfficer,
-  toggleAddCriminal,addPerson,filterWanted,renamePerson,changePhoto,
-  closeInputDialog,confirmInput,deletePerson,closeConfirm,confirmDelete,
-  showAdminPart,submitComplaint,deleteComplaint,renderOfficerRegistration,
-  renderWanted,renderAdmin,renderComplaints
-});
-
-</script>
-
-<div id="confirmOverlay" class="custom-confirm-overlay">
-  <div class="custom-confirm">
-    <h3 id="confirmTitle">Әрекетті растау</h3>
-    <p id="confirmText">Өшіру керек пе?</p>
-    <div class="custom-confirm-actions">
-      <button type="button" onclick="closeConfirm()">Бас тарту</button>
-      <button type="button" class="confirm-danger" onclick="confirmDelete()">Өшіру</button>
-    </div>
-  </div>
-</div>
-<div id="fireOverlay" class="custom-confirm-overlay">
-  <div class="custom-confirm">
-    <h3>⛔ Жұмыстан шығару</h3>
-    <p>Осы қызметкерді жұмыстан шығарасыз ба? Қызметкер тізімнен өшеді.</p>
-    <div class="custom-confirm-actions">
-      <button type="button" onclick="closeFireOfficer()">Бас тарту</button>
-      <button type="button" class="confirm-danger" onclick="confirmFireOfficer()">Жұмыстан шығару</button>
-    </div>
-  </div>
-</div>
-<div id="inputOverlay" class="custom-confirm-overlay">
-  <div class="custom-confirm input-dialog">
-    <h3>✏️ Атын өзгерту</h3>
-    <p>Жаңа аты-жөні:</p>
-    <input id="customInput" class="custom-dialog-input" type="text" autocomplete="off">
-    <div class="custom-confirm-actions">
-      <button type="button" onclick="closeInputDialog()">Бас тарту</button>
-      <button type="button" onclick="confirmInput()">Сақтау</button>
-    </div>
-  </div>
-</div>
-</body>
-</html>
+   if(m) max=Ma
