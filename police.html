@@ -151,7 +151,19 @@ body.panel-mode .logo{padding-right:0}
 .input-dialog{padding-bottom:20px}
 .custom-dialog-input{width:100%;box-sizing:border-box;border:0;border-bottom:2px solid #8ea1b5;outline:none;background:transparent;color:#eef6ff;font-size:20px;padding:10px 0 8px;margin-top:6px}
 .custom-dialog-input:focus{border-bottom-color:#4b79a1}
-</style></head>
+</style>
+
+<style>
+#audioRecordBtn.recording{transform:scale(1.05);box-shadow:0 0 0 3px rgba(255,80,80,.2);}
+#dutyChat audio{display:block;}
+@media(max-width:600px){#dutyChatPanel input{font-size:16px}.panelNav button{font-size:14px;padding:11px 13px}}
+
+<style>
+#callOnlineList button{width:100%;text-align:left;border:1px solid rgba(255,255,255,.14);border-radius:12px;padding:12px;background:rgba(255,255,255,.06);color:#eef6ff;font-size:16px}
+#callOnlineList button:disabled{opacity:.45}
+</style>
+</style>
+</head>
 <body>
 <header>
 <div class="wrap nav">
@@ -246,10 +258,11 @@ body.panel-mode .logo{padding-right:0}
 </div>
 
 <div class="panelNav">
-  <button onclick="showAdminPart('complaints')">📝 Өтініш қаралымы</button>
-  <button onclick="showAdminPart('criminals')">🔎 Қылмыскерлер</button>
-  <button onclick="showAdminPart('officers')">👮 Полиция қызметкерлері</button>
+  <button type="button" onclick="showAdminPart('complaints')">📝 Өтініш қаралымы</button>
+  <button type="button" onclick="showAdminPart('criminals')">🔎 Қылмыскерлер</button>
+  <button type="button" onclick="showAdminPart('officers')">👮 Полиция қызметкерлері</button>
 </div>
+
 
 <div id="complaints" class="adminPart card" style="margin-top:20px">
 <h3>📝 Өтініш қаралымы</h3>
@@ -346,7 +359,7 @@ function startPresence(){
   const name=(saved&&saved.name)?saved.name:'Қонақ';
   const data={name,at:Date.now()};
   presenceRef.onDisconnect().remove().catch(()=>{});
-  set(presenceRef,data).catch(()=>{});
+  presenceRef.set(data).catch(()=>{});
   firebasePath('policeDemo/presence').on('value',snap=>{
     const list=snap.exists()?Object.values(snap.val()):[];
     const el=document.getElementById('onlinePlayers');
@@ -419,19 +432,4 @@ let staff=JSON.parse(localStorage.getItem('policeDemoStaff')||'[]');
    seen.add(name.toLowerCase());
    clean.push({name,id:''});
  });
- clean.forEach((x,i)=>x.id='POL-'+(1001+i));
- staff=clean;
- localStorage.setItem('policeDemoStaff',JSON.stringify(staff));
- const saved=JSON.parse(localStorage.getItem('policeDemoOfficer')||'null');
- if(saved){
-   const match=staff.find(x=>x.name.toLowerCase()===String(saved.name||'').toLowerCase());
-   if(match) localStorage.setItem('policeDemoOfficer',JSON.stringify(match));
-   else localStorage.removeItem('policeDemoOfficer');
- }
-})();
-
-function generateEmployeeId(){
- let max=1000;
- staff.forEach(x=>{
-   const m=String(x.id||'').match(/POL-(\d+)/);
-   if(m) max=Ma
+ clean.forEach((x,i)=>x.id='PO
